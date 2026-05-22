@@ -68,6 +68,11 @@ function setTheme(t) {
   localStorage.setItem('mimostory-theme', t);
   document.getElementById('theme-toggle').textContent = t === 'dark' ? '🌙' : '☀️';
 }
+// Allow ?theme=light/dark URL override (for screenshots, etc.)
+const urlTheme = new URLSearchParams(location.search).get('theme');
+if (urlTheme === 'light' || urlTheme === 'dark') {
+  localStorage.setItem('mimostory-theme', urlTheme);
+}
 setTheme(localStorage.getItem('mimostory-theme') || 'dark');
 document.getElementById('theme-toggle').onclick = () =>
   setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
