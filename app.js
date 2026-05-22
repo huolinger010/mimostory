@@ -94,9 +94,12 @@ const t = (k) => I18N[lang][k] || k;
 const fmtAddr = (a) => a ? `${a.slice(0,6)}…${a.slice(-4)}` : '';
 const fmtNum = (n) => {
   if (n == null || isNaN(n)) return '0';
+  n = Number(n);
+  if (n === 0) return '0';
   if (n >= 1e9) return (n/1e9).toFixed(1).replace(/\.0$/,'') + 'B';
   if (n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
   if (n >= 1e3) return (n/1e3).toFixed(1).replace(/\.0$/,'') + 'K';
+  if (Number.isInteger(n)) return String(n);
   return n.toFixed(n < 10 ? 2 : 0);
 };
 const fmtEth = (wei) => {
