@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>MiMoStory — Wallet Life Story Generator</title>
+<meta name="description" content="Turn any Ethereum address or ENS into a cinematic life story powered by Xiaomi MiMo V2.5 — 5 chapters of onchain narrative + shareable poster." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#07070d; --bg2:#0e0e18; --panel:#13131f; --panel2:#1a1a2a;
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+  --text:#f5f5fa; --muted:#8b8ba0; --dim:#5a5a70;
+  --acc:#ff7a18; --acc2:#ffb347; --acc3:#a855f7; --acc4:#3b82f6;
+  --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  --grad:linear-gradient(135deg,#ff7a18 0%,#ff3d6f 50%,#a855f7 100%);
+  --grad2:linear-gradient(135deg,#3b82f6 0%,#a855f7 100%);
+  --shadow:0 20px 60px rgba(255,122,24,.18);
+}
+[data-theme="light"]{
+  --bg:#fafaf7; --bg2:#fff; --panel:#fff; --panel2:#f6f5f0;
+  --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.14);
+  --text:#0a0a14; --muted:#5a5a70; --dim:#9a9aa8;
+  --shadow:0 20px 60px rgba(255,122,24,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.55;min-height:100vh;overflow-x:hidden}
+body{background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(255,122,24,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(168,85,247,.10),transparent 60%),var(--bg)}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:rgba(7,7,13,.7);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+[data-theme="light"] .nav{background:rgba(250,250,247,.8)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 8px 24px rgba(255,122,24,.4)}
+.nav-actions{display:flex;gap:12px;align-items:center}
+.btn-icon{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.btn-icon:hover{border-color:var(--line2);transform:translateY(-1px)}
+
+/* hero */
+.hero{max-width:980px;margin:60px auto 40px;padding:0 24px;text-align:center}
+.hero-mark{font-size:64px;margin-bottom:18px;filter:drop-shadow(0 8px 24px rgba(255,122,24,.4))}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(40px,7vw,72px);font-weight:900;letter-spacing:-.03em;line-height:1.05;margin-bottom:18px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:clamp(15px,1.6vw,18px);color:var(--muted);max-width:640px;margin:0 auto 26px;font-weight:400}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:30px}
+.badge{padding:6px 12px;border-radius:100px;background:var(--panel);border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--muted)}
+.badge.dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good);margin-right:6px;vertical-align:1px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* search */
+.search-wrap{max-width:680px;margin:0 auto 40px;padding:0 24px}
+.search{display:flex;gap:8px;padding:8px;background:var(--panel);border:1px solid var(--line2);border-radius:18px;box-shadow:var(--shadow);transition:.2s}
+.search:focus-within{border-color:var(--acc);box-shadow:0 20px 60px rgba(255,122,24,.3)}
+.search input{flex:1;background:transparent;border:none;outline:none;color:var(--text);padding:14px 18px;font-size:16px;font-weight:500}
+.search input::placeholder{color:var(--dim)}
+.btn-go{padding:14px 28px;border-radius:12px;background:var(--grad);color:#fff;font-weight:700;font-size:14px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;transition:.2s;white-space:nowrap}
+.btn-go:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(255,122,24,.4)}
+.btn-go:disabled{opacity:.5;cursor:not-allowed}
+
+/* examples */
+.examples{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:680px;margin:0 auto 60px;padding:0 24px}
+.ex-pill{padding:8px 14px;border-radius:100px;background:var(--panel);border:1px solid var(--line);font-size:13px;font-weight:500;color:var(--muted);transition:.2s}
+.ex-pill:hover{border-color:var(--acc);color:var(--text);transform:translateY(-1px)}
+.ex-pill strong{color:var(--text);font-weight:700}
+
+/* loading */
+.loading{display:none;max-width:680px;margin:0 auto 60px;padding:30px;text-align:center}
+.loading.on{display:block}
+.spinner{width:48px;height:48px;border:3px solid var(--line2);border-top-color:var(--acc);border-radius:50%;margin:0 auto 18px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-text{color:var(--muted);font-size:14px;font-weight:500}
+.load-step{display:inline-block;color:var(--text);font-weight:600;margin-left:6px}
+
+/* error */
+.error{display:none;max-width:680px;margin:0 auto 40px;padding:18px 22px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:14px;color:#fca5a5;font-size:14px}
+.error.on{display:block}
+
+/* story container */
+.story{display:none;max-width:880px;margin:0 auto 80px;padding:0 24px}
+.story.on{display:block}
+
+/* hero card */
+.profile{padding:32px;background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);border:1px solid var(--line2);border-radius:24px;margin-bottom:32px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.avatar{width:88px;height:88px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:34px;flex-shrink:0;box-shadow:0 12px 32px rgba(255,122,24,.3)}
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.profile-info{flex:1;min-width:200px}
+.profile-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.profile-addr{font-family:'Monaco',monospace;font-size:13px;color:var(--muted);background:var(--bg);padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:8px}
+.profile-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{padding:4px 10px;border-radius:100px;background:rgba(255,122,24,.12);border:1px solid rgba(255,122,24,.3);font-size:11px;font-weight:700;color:var(--acc2);letter-spacing:.04em}
+.tag.purple{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.3);color:#c4b5fd}
+.tag.blue{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:#93c5fd}
+.tag.green{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:#86efac}
+
+/* stats strip */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:32px}
+.stat{padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.stat-sub{font-size:11px;color:var(--dim);margin-top:2px}
+
+/* chapter */
+.chapter{padding:36px 32px;background:var(--panel);border:1px solid var(--line);border-radius:20px;margin-bottom:18px;position:relative;overflow:hidden;animation:rise .6s ease both}
+.chapter::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--grad)}
+.chapter:nth-child(2)::before{background:linear-gradient(180deg,#3b82f6,#06b6d4)}
+.chapter:nth-child(3)::before{background:linear-gradient(180deg,#a855f7,#ec4899)}
+.chapter:nth-child(4)::before{background:linear-gradient(180deg,#22c55e,#84cc16)}
+.chapter:nth-child(5)::before{background:linear-gradient(180deg,#f59e0b,#ef4444)}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ch-num{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.2em;margin-bottom:8px}
+.ch-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:16px}
+.ch-intro{font-size:17px;font-weight:500;font-style:italic;color:var(--acc2);margin-bottom:18px;padding-left:16px;border-left:2px solid var(--acc);line-height:1.6}
+.ch-body{font-size:15px;color:var(--text);line-height:1.75}
+.ch-body p{margin-bottom:12px}
+.ch-body strong{color:var(--acc2);font-weight:700}
+.ch-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.meta{padding:6px 12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--muted);font-weight:600}
+.meta strong{color:var(--text);font-weight:700}
+
+/* poster */
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:32px}
+.btn{padding:14px 24px;border-radius:12px;font-weight:700;font-size:14px;letter-spacing:.02em;border:1px solid var(--line2);background:var(--panel);transition:.2s;display:flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--acc);transform:translateY(-1px)}
+.btn-primary{background:var(--grad);color:#fff;border:none}
+.btn-primary:hover{box-shadow:0 12px 28px rgba(255,122,24,.4)}
+
+/* poster modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);z-index:100;align-items:center;justify-content:center;padding:20px;animation:fade .25s}
+.modal.on{display:flex}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal-card{background:var(--panel);border:1px solid var(--line2);border-radius:24px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:900}
+.poster-preview{background:var(--bg);border-radius:16px;padding:16px;margin-bottom:16px;display:flex;justify-content:center}
+.poster-preview canvas,.poster-preview img{max-width:100%;border-radius:12px;display:block}
+
+/* footer */
+.foot{padding:40px 24px;text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:40px}
+.foot a{color:var(--text);font-weight:600;border-bottom:1px solid transparent;transition:.2s}
+.foot a:hover{border-color:var(--acc)}
+
+/* responsive */
+@media (max-width:640px){
+  .nav{padding:14px 16px}
+  .hero{margin:40px auto 30px}
+  .hero-mark{font-size:48px}
+  .profile{padding:22px;gap:16px}
+  .avatar{width:64px;height:64px;font-size:24px}
+  .chapter{padding:24px 20px}
+  .ch-title{font-size:24px}
+  .stat-value{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-mark">📖</div>
+    <span>MiMoStory</span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-icon" id="lang-toggle" title="Switch language">🌐</button>
+    <button class="btn-icon" id="theme-toggle" title="Toggle theme">🌙</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-mark">📖</div>
+  <h1 data-i18n="hero-title">Every Wallet Has a Story</h1>
+  <p data-i18n="hero-sub">Turn any Ethereum address or ENS into a cinematic life story across five chapters — powered by Xiaomi MiMo V2.5 reading live onchain history.</p>
+  <div class="badges">
+    <span class="badge dot" data-i18n="badge-live">Live Onchain</span>
+    <span class="badge" data-i18n="badge-free">100% Free</span>
+    <span class="badge" data-i18n="badge-ai">Powered by MiMo V2.5</span>
+    <span class="badge" data-i18n="badge-share">Shareable Poster</span>
+  </div>
+</section>
+
+<div class="search-wrap">
+  <div class="search">
+    <input id="addr-input" type="text" placeholder="vitalik.eth or 0x..." autocomplete="off" spellcheck="false" />
+    <button class="btn-go" id="go-btn"><span data-i18n="btn-go">Read My Story</span> →</button>
+  </div>
+</div>
+
+<div class="examples">
+  <span data-i18n="try-label" style="color:var(--muted);font-size:13px;align-self:center;margin-right:4px">Try:</span>
+  <button class="ex-pill" data-addr="vitalik.eth"><strong>vitalik.eth</strong></button>
+  <button class="ex-pill" data-addr="cobie.eth"><strong>cobie.eth</strong></button>
+  <button class="ex-pill" data-addr="hayden.eth"><strong>hayden.eth</strong></button>
+  <button class="ex-pill" data-addr="pranksy.eth"><strong>pranksy.eth</strong></button>
+  <button class="ex-pill" data-addr="punk6529.eth"><strong>punk6529.eth</strong></button>
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div class="load-text"><span data-i18n="loading">Reading the chains</span><span class="load-step" id="load-step">…</span></div>
+</div>
+
+<div class="error" id="error"></div>
+
+<section class="story" id="story"></section>
+
+<div class="modal" id="poster-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title" data-i18n="poster-title">Your Story Poster</div>
+      <button class="btn-icon" id="close-modal">✕</button>
+    </div>
+    <div class="poster-preview" id="poster-preview"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="download-poster">⬇ <span data-i18n="download">Download PNG</span></button>
+      <button class="btn" id="share-x">𝕏 <span data-i18n="share-x">Share on X</span></button>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  Built with 🧠 <strong>Xiaomi MiMo V2.5</strong> · <a href="https://github.com/huolinger010/mimostory" target="_blank">GitHub</a> · <a href="https://etherscan.io" target="_blank">Etherscan</a> · © 2026 MiMoStory
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
